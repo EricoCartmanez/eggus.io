@@ -241,7 +241,10 @@
             try {
                 const { data, error } = await supabaseClient.auth.signUp({
                     email: email,
-                    password: password
+                    password: password,
+                    options: {
+                        emailRedirectTo: window.location.href
+                    }
                 })
 
                 if (error) {
@@ -250,7 +253,7 @@
                     statusDiv.innerHTML = `
                         <p class="info">✅ Account created!</p>
                         <p>Check your email (${email}) to confirm your account.</p>
-                        <p style="font-size:12px; opacity:0.8;">After confirmation, return here to sign in.</p>
+                        <p style="font-size:12px; opacity:0.8;">After confirmation, you'll be redirected back here automatically.</p>
                     `
                     document.getElementById('signupEmail').value = ''
                     document.getElementById('signupPassword').value = ''
