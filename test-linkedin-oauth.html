@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test LinkedIn OAuth - Eggus</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        button {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #006399;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            min-height: 100px;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .error {
+            color: #f87171;
+        }
+        pre {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥚 Test LinkedIn OAuth</h1>
+        <button id="loginBtn" onclick="loginWithLinkedIn()">Sign in with LinkedIn</button>
+        <button id="logoutBtn" onclick="logout()" style="display:none; background: #dc2626;">Sign Out</button>
+        
+        <div class="status" id="status">
+            <p>Click the button above to test LinkedIn authentication</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+        const SUPABASE_URL = 'https://fplxqligflyefbcygpms.supabase.co'
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'
+
+        const { createClient } = window.supabase
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        async function loginWithLinkedIn() {
+            const statusDiv = document.getElementById('status')
+            statusDiv.innerHTML = '<p>Redirecting to LinkedIn...</p>'
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'linkedin_oidc',
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                })
+
+                if (error) {
+                    statusDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`
+                    console.error('OAuth error:', error)
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`
+                console.error('Exception:', err)
+            }
+        }
+
+        async function logout() {
+            const { error } = await supabaseClient.auth.signOut()
+            if (!error) {
+                document.getElementById('status').innerHTML = '<p>Logged out successfully</p>'
+                document.getElementById('loginBtn').style.display = 'inline-block'
+                document.getElementById('logoutBtn').style.display = 'none'
+            }
+        }
+
+        // Check if user is already logged in
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event, session)
+            
+            if (session) {
+                const user = session.user
+                document.getElementById('loginBtn').style.display = 'none'
+                document.getElementById('logoutBtn').style.display = 'inline-block'
+                
+                document.getElementById('status').innerHTML = `
+                    <p class="success">✅ Successfully authenticated!</p>
+                    <p><strong>User ID:</strong> ${user.id}</p>
+                    <p><strong>Email:</strong> ${user.email || 'No email'}</p>
+                    <p><strong>Provider:</strong> ${user.app_metadata.provider}</p>
+                    <p><strong>Name:</strong> ${user.user_metadata.full_name || 'N/A'}</p>
+                    <pre>${JSON.stringify(user.user_metadata, null, 2)}</pre>
+                `
+            } else if (event === 'SIGNED_OUT') {
+                document.getElementById('status').innerHTML = '<p>Click the button above to test LinkedIn authentication</p>'
+                document.getElementById('loginBtn').style.display = 'inline-block'
+                document.getElementById('logoutBtn').style.display = 'none'
+            }
+        })
+
+        // Check session on page load
+        supabaseClient.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                // Trigger the onAuthStateChange handler
+                supabaseClient.auth.onAuthStateChange((event, session) => {})
+            }
+        })
+    </script>
+</body>
+</html>
