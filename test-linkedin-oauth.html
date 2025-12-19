@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test LinkedIn OAuth - Eggus</title>
+    <title>Test OAuth - Eggus</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -21,26 +21,57 @@
             padding: 50px;
             border-radius: 20px;
             backdrop-filter: blur(10px);
+            max-width: 800px;
         }
         h1 {
             margin-bottom: 30px;
         }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
         button {
-            background: #0077b5;
             color: white;
             border: none;
             padding: 15px 40px;
             font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            font-weight: 500;
         }
         button:hover {
-            background: #006399;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         button:disabled {
             background: #ccc;
             cursor: not-allowed;
+            transform: none;
+        }
+        .linkedin-btn {
+            background: #0077b5;
+        }
+        .linkedin-btn:hover {
+            background: #006399;
+        }
+        .facebook-btn {
+            background: #1877f2;
+        }
+        .facebook-btn:hover {
+            background: #0c63d4;
+        }
+        .instagram-btn {
+            background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+        }
+        .logout-btn {
+            background: #dc2626;
+        }
+        .logout-btn:hover {
+            background: #b91c1c;
         }
         .status {
             margin-top: 30px;
@@ -61,38 +92,64 @@
             padding: 15px;
             border-radius: 5px;
             overflow-x: auto;
-            max-width: 600px;
+            max-width: 700px;
             margin: 20px auto;
+            font-size: 12px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🥚 Test LinkedIn OAuth</h1>
-        <button id="loginBtn" onclick="loginWithLinkedIn()">Sign in with LinkedIn</button>
-        <button id="logoutBtn" onclick="logout()" style="display:none; background: #dc2626;">Sign Out</button>
+        <h1>🥚 Test OAuth Providers</h1>
+        
+        <div class="buttons" id="loginButtons">
+            <button class="linkedin-btn" onclick="loginWith('linkedin_oidc')">
+                Sign in with LinkedIn
+            </button>
+            <button class="facebook-btn" onclick="loginWith('facebook')">
+                Sign in with Facebook
+            </button>
+            <button class="instagram-btn" onclick="loginWith('instagram')">
+                Sign in with Instagram
+            </button>
+        </div>
+        
+        <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display:none;">
+            Sign Out
+        </button>
         
         <div class="status" id="status">
-            <p>Click the button above to test LinkedIn authentication</p>
+            <p>Click a button above to test OAuth authentication</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
         const SUPABASE_URL = 'https://fplxqliqflyefbcygpms.supabase.co'
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwbHhxbGlxZmx5ZWZiY3lncG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4Mjg2MjUsImV4cCI6MjA3OTQwNDYyNX0.sThGKfplIpmYWfXyCj0LuSQOo0gv7TmkDJXJfWxA6_w'
 
         const { createClient } = window.supabase
         const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-        async function loginWithLinkedIn() {
+        async function loginWith(provider) {
             const statusDiv = document.getElementById('status')
-            statusDiv.innerHTML = '<p>Redirecting to LinkedIn...</p>'
+            const providerName = provider.charAt(0).toUpperCase() + provider.slice(1).replace('_oidc', '')
+            statusDiv.innerHTML = `<p>Redirecting to ${providerName}...</p>`
             
             try {
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
-                    provider: 'linkedin_oidc',
+                    provider: provider,
                     options: {
                         redirectTo: window.location.href
                     }
@@ -112,7 +169,7 @@
             const { error } = await supabaseClient.auth.signOut()
             if (!error) {
                 document.getElementById('status').innerHTML = '<p>Logged out successfully</p>'
-                document.getElementById('loginBtn').style.display = 'inline-block'
+                document.getElementById('loginButtons').style.display = 'flex'
                 document.getElementById('logoutBtn').style.display = 'none'
             }
         }
@@ -123,20 +180,23 @@
             
             if (session) {
                 const user = session.user
-                document.getElementById('loginBtn').style.display = 'none'
+                document.getElementById('loginButtons').style.display = 'none'
                 document.getElementById('logoutBtn').style.display = 'inline-block'
                 
+                const providerName = user.app_metadata.provider.charAt(0).toUpperCase() + 
+                                    user.app_metadata.provider.slice(1).replace('_oidc', '')
+                
                 document.getElementById('status').innerHTML = `
-                    <p class="success">✅ Successfully authenticated!</p>
+                    <p class="success">✅ Successfully authenticated with ${providerName}!</p>
                     <p><strong>User ID:</strong> ${user.id}</p>
                     <p><strong>Email:</strong> ${user.email || 'No email'}</p>
                     <p><strong>Provider:</strong> ${user.app_metadata.provider}</p>
-                    <p><strong>Name:</strong> ${user.user_metadata.full_name || 'N/A'}</p>
+                    <p><strong>Name:</strong> ${user.user_metadata.full_name || user.user_metadata.name || 'N/A'}</p>
                     <pre>${JSON.stringify(user.user_metadata, null, 2)}</pre>
                 `
             } else if (event === 'SIGNED_OUT') {
-                document.getElementById('status').innerHTML = '<p>Click the button above to test LinkedIn authentication</p>'
-                document.getElementById('loginBtn').style.display = 'inline-block'
+                document.getElementById('status').innerHTML = '<p>Click a button above to test OAuth authentication</p>'
+                document.getElementById('loginButtons').style.display = 'flex'
                 document.getElementById('logoutBtn').style.display = 'none'
             }
         })
