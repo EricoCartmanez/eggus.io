@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmed - Eggus</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .email-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            word-break: break-all;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Instructions */
+        .instructions {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-align: left;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Error State */
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        }
+
+        .error-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        /* Desktop notice */
+        .desktop-notice {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .desktop-notice strong {
+            color: white;
+        }
+
+        /* Hidden by default */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Eggus Logo" class="logo">
+        
+        <div class="card">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="spinner"></div>
+                <p>Confirming your email...</p>
+            </div>
+
+            <!-- Success State -->
+            <div id="successState" class="hidden">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                
+                <h1>Email Confirmed! 🎉</h1>
+                <p class="subtitle">Your account is now verified and ready to use.</p>
+                
+                <div id="emailBadge" class="email-badge"></div>
+
+                <!-- Mobile: Deep link button -->
+                <a href="eggus://auth/confirmed" class="btn btn-primary" id="openAppBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12" y2="18"></line>
+                    </svg>
+                    Open Eggus
+                </a>
+
+                <a href="index.html" class="btn btn-secondary">
+                    Go to Homepage
+                </a>
+
+                <!-- Instructions for desktop users -->
+                <div class="instructions" id="desktopInstructions">
+                    <h3>On a computer?</h3>
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <span>Open the Eggus app on your phone</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <span>Go to <strong>My Account</strong> and tap <strong>Log In</strong></span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span>Enter your email and password to sign in</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="hidden">
+                <div class="error-icon">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                
+                <h1>Something went wrong</h1>
+                <p class="subtitle" id="errorMessage">We couldn't confirm your email. The link may have expired or already been used.</p>
+
+                <a href="index.html" class="btn btn-primary">
+                    Go to Homepage
+                </a>
+
+                <p style="margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
+                    Need help? <a href="mailto:support@eggus.io" style="color: rgba(255,255,255,0.8);">Contact support</a>
+                </p>
+            </div>
+
+            <!-- Already Confirmed State -->
+            <div id="alreadyConfirmedState" class="hidden">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                
+                <h1>Already Confirmed!</h1>
+                <p class="subtitle">Your email has already been verified. You're all set!</p>
+
+                <a href="eggus://auth/confirmed" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                        <line x1="12" y1="18" x2="12" y2="18"></line>
+                    </svg>
+                    Open Eggus
+                </a>
+
+                <a href="index.html" class="btn btn-secondary">
+                    Go to Homepage
+                </a>
+            </div>
+        </div>
+
+        <footer>
+            <a href="index.html">← Back to Eggus</a>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://fplxqliqflyefbcygpms.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwbHhxbGlxZmx5ZWZiY3lncG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4Mjg2MjUsImV4cCI6MjA3OTQwNDYyNX0.sThGKfplIpmYWfXyCj0LuSQOo0gv7TmkDJXJfWxA6_w'
+
+        const { createClient } = window.supabase
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+        // UI Elements
+        const loadingState = document.getElementById('loadingState')
+        const successState = document.getElementById('successState')
+        const errorState = document.getElementById('errorState')
+        const alreadyConfirmedState = document.getElementById('alreadyConfirmedState')
+        const emailBadge = document.getElementById('emailBadge')
+        const errorMessage = document.getElementById('errorMessage')
+
+        function showState(state) {
+            loadingState.classList.add('hidden')
+            successState.classList.add('hidden')
+            errorState.classList.add('hidden')
+            alreadyConfirmedState.classList.add('hidden')
+            state.classList.remove('hidden')
+        }
+
+        function detectMobile() {
+            return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+        }
+
+        async function handleConfirmation() {
+            // Parse the URL hash for tokens (Supabase uses hash-based redirects)
+            const hashParams = new URLSearchParams(window.location.hash.substring(1))
+            const accessToken = hashParams.get('access_token')
+            const refreshToken = hashParams.get('refresh_token')
+            const type = hashParams.get('type')
+            const error = hashParams.get('error')
+            const errorDescription = hashParams.get('error_description')
+
+            // Check for errors in URL
+            if (error) {
+                showState(errorState)
+                errorMessage.textContent = errorDescription || 'An error occurred during confirmation.'
+                return
+            }
+
+            // If we have tokens in the hash, set the session
+            if (accessToken && refreshToken) {
+                try {
+                    const { data, error: sessionError } = await supabaseClient.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    })
+
+                    if (sessionError) {
+                        console.error('Session error:', sessionError)
+                        showState(errorState)
+                        errorMessage.textContent = sessionError.message
+                        return
+                    }
+
+                    if (data.user) {
+                        // Success!
+                        emailBadge.textContent = data.user.email || 'Your account'
+                        showState(successState)
+
+                        // On mobile, try to auto-open the app after a short delay
+                        if (detectMobile()) {
+                            setTimeout(() => {
+                                window.location.href = 'eggus://auth/confirmed?email=' + encodeURIComponent(data.user.email || '')
+                            }, 1500)
+                        }
+                        return
+                    }
+                } catch (err) {
+                    console.error('Error setting session:', err)
+                    showState(errorState)
+                    errorMessage.textContent = 'Failed to verify your email. Please try again.'
+                    return
+                }
+            }
+
+            // Check if user is already logged in (came from a different flow)
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession()
+                
+                if (session && session.user) {
+                    // User is already authenticated
+                    if (session.user.email_confirmed_at) {
+                        emailBadge.textContent = session.user.email || 'Your account'
+                        showState(successState)
+                    } else {
+                        // Logged in but email not confirmed yet
+                        showState(errorState)
+                        errorMessage.textContent = 'Your email has not been confirmed yet. Please check your inbox.'
+                    }
+                    return
+                }
+            } catch (err) {
+                console.error('Error checking session:', err)
+            }
+
+            // No tokens and no session - might be an invalid or expired link
+            // Check if there's a confirmation type in the URL
+            if (type === 'signup' || type === 'email_change') {
+                // This was a confirmation link but something went wrong
+                showState(errorState)
+                errorMessage.textContent = 'This confirmation link has expired or already been used. Please request a new one.'
+            } else {
+                // User landed here without proper parameters
+                showState(errorState)
+                errorMessage.textContent = 'Invalid confirmation link. Please check your email for the correct link.'
+            }
+        }
+
+        // Listen for auth state changes
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            console.log('Auth event:', event)
+            
+            if (event === 'SIGNED_IN' && session) {
+                emailBadge.textContent = session.user.email || 'Your account'
+                showState(successState)
+
+                // On mobile, try to open the app
+                if (detectMobile()) {
+                    setTimeout(() => {
+                        window.location.href = 'eggus://auth/confirmed?email=' + encodeURIComponent(session.user.email || '')
+                    }, 1500)
+                }
+            }
+        })
+
+        // Run on page load
+        handleConfirmation()
+    </script>
+</body>
+</html>
