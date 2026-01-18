@@ -400,13 +400,17 @@
         }
 
         async function handleConfirmation() {
-            // Parse the URL hash for tokens (Supabase uses hash-based redirects)
+            // Check for code parameter (PKCE flow - email confirmation)
+            const urlParams = new URLSearchParams(window.location.search)
+            const code = urlParams.get('code')
+            
+            // Parse the URL hash for tokens (older flow)
             const hashParams = new URLSearchParams(window.location.hash.substring(1))
             const accessToken = hashParams.get('access_token')
             const refreshToken = hashParams.get('refresh_token')
             const type = hashParams.get('type')
-            const error = hashParams.get('error')
-            const errorDescription = hashParams.get('error_description')
+            const error = hashParams.get('error') || urlParams.get('error')
+            const errorDescription = hashParams.get('error_description') || urlParams.get('error_description')
 
             // Check for errors in URL
             if (error) {
@@ -415,7 +419,42 @@
                 return
             }
 
-            // If we have tokens in the hash, set the session
+            // Handle PKCE code exchange (email confirmation flow)
+            if (code) {
+                try {
+                    console.log('Exchanging code for session...')
+                    const { data, error: exchangeError } = await supabaseClient.auth.exchangeCodeForSession(code)
+                    
+                    if (exchangeError) {
+                        console.error('Code exchange error:', exchangeError)
+                        showState(errorState)
+                        errorMessage.textContent = exchangeError.message || 'Failed to verify your email.'
+                        return
+                    }
+                    
+                    if (data.user) {
+                        // Success!
+                        console.log('Email confirmed successfully!')
+                        emailBadge.textContent = data.user.email || 'Your account'
+                        showState(successState)
+                        
+                        // On mobile, try to auto-open the app after a short delay
+                        if (detectMobile()) {
+                            setTimeout(() => {
+                                window.location.href = 'eggus://auth/confirmed?email=' + encodeURIComponent(data.user.email || '')
+                            }, 1500)
+                        }
+                        return
+                    }
+                } catch (err) {
+                    console.error('Error exchanging code:', err)
+                    showState(errorState)
+                    errorMessage.textContent = 'Failed to verify your email. The link may have expired.'
+                    return
+                }
+            }
+
+            // If we have tokens in the hash, set the session (older flow)
             if (accessToken && refreshToken) {
                 try {
                     const { data, error: sessionError } = await supabaseClient.auth.setSession({
