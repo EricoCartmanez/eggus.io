@@ -219,61 +219,34 @@
             fill: none;
         }
 
-        /* Desktop notice */
-        .desktop-notice {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .desktop-notice strong {
-            color: white;
-        }
-
-        /* Hidden by default */
         .hidden {
             display: none !important;
         }
 
-        /* Footer */
         footer {
-            margin-top: 40px;
-            text-align: center;
+            margin-top: 30px;
         }
 
         footer a {
             color: rgba(255, 255, 255, 0.6);
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
 
         footer a:hover {
             color: white;
         }
-
-        @media (max-width: 480px) {
-            .card {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="logo.png" alt="Eggus Logo" class="logo">
-        
+        <img src="app-icon.png" alt="Eggus" class="logo" onerror="this.style.display='none'">
+
         <div class="card">
             <!-- Loading State -->
             <div id="loadingState" class="loading-state">
                 <div class="spinner"></div>
-                <p>Confirming your email...</p>
+                <p>Verifying your email...</p>
             </div>
 
             <!-- Success State -->
@@ -284,13 +257,12 @@
                     </svg>
                 </div>
                 
-                <h1>Email Confirmed! 🎉</h1>
-                <p class="subtitle">Your account is now verified and ready to use.</p>
-                
-                <div id="emailBadge" class="email-badge"></div>
+                <h1>Email Confirmed!</h1>
+                <p class="subtitle">Your account is now fully verified.</p>
 
-                <!-- Mobile: Deep link button -->
-                <a href="eggus://auth/confirmed" class="btn btn-primary" id="openAppBtn">
+                <div class="email-badge" id="emailBadge">your@email.com</div>
+
+                <a href="#" id="openAppBtn" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                         <line x1="12" y1="18" x2="12" y2="18"></line>
@@ -352,7 +324,7 @@
                 <h1>Already Confirmed!</h1>
                 <p class="subtitle">Your email has already been verified. You're all set!</p>
 
-                <a href="eggus://auth/confirmed" class="btn btn-primary">
+                <a href="#" id="openAppBtnAlready" class="btn btn-primary">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                         <line x1="12" y1="18" x2="12" y2="18"></line>
@@ -386,6 +358,11 @@
         const alreadyConfirmedState = document.getElementById('alreadyConfirmedState')
         const emailBadge = document.getElementById('emailBadge')
         const errorMessage = document.getElementById('errorMessage')
+        const openAppBtn = document.getElementById('openAppBtn')
+        const openAppBtnAlready = document.getElementById('openAppBtnAlready')
+
+        // Store the deep link URL for the button
+        let appDeepLink = 'eggus://auth/confirmed'
 
         function showState(state) {
             loadingState.classList.add('hidden')
@@ -398,6 +375,20 @@
         function detectMobile() {
             return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
         }
+
+        function openApp() {
+            window.location.href = appDeepLink
+        }
+
+        // Set up button click handlers
+        openAppBtn.addEventListener('click', (e) => {
+            e.preventDefault()
+            openApp()
+        })
+        openAppBtnAlready.addEventListener('click', (e) => {
+            e.preventDefault()
+            openApp()
+        })
 
         async function handleConfirmation() {
             // Check for code parameter (PKCE flow - email confirmation)
@@ -419,24 +410,27 @@
                 return
             }
 
-            // If we have a code parameter, the email was verified when user clicked the link
-            // The /verify endpoint already ran server-side - we just need to show success
-            // (We can't exchange the code because the PKCE verifier is in the iOS app)
+            // PKCE FLOW: If we have a code parameter, pass it to the iOS app
+            // The app has the code_verifier needed to exchange this code for a session
             if (code) {
-                console.log('Email verification code detected - verification happened server-side')
+                console.log('PKCE code detected - passing to iOS app for exchange')
+                
+                // Build the deep link with the code so iOS can exchange it
+                appDeepLink = 'eggus://auth/callback?code=' + encodeURIComponent(code)
+                
                 emailBadge.textContent = 'Your email has been verified'
                 showState(successState)
                 
-                // On mobile, try to open the app after a short delay
+                // On mobile, try to open the app immediately after a short delay
                 if (detectMobile()) {
                     setTimeout(() => {
-                        window.location.href = 'eggus://auth/confirmed'
-                    }, 2000)
+                        openApp()
+                    }, 1500)
                 }
                 return
             }
 
-            // If we have tokens in the hash, set the session (older flow)
+            // HASH FLOW: If we have tokens in the hash, set the session (older/OAuth flow)
             if (accessToken && refreshToken) {
                 try {
                     const { data, error: sessionError } = await supabaseClient.auth.setSession({
@@ -454,12 +448,16 @@
                     if (data.user) {
                         // Success!
                         emailBadge.textContent = data.user.email || 'Your account'
+                        // For hash flow, we can pass tokens to the app
+                        appDeepLink = 'eggus://auth/callback#access_token=' + accessToken + 
+                                      '&refresh_token=' + refreshToken +
+                                      '&type=signup'
                         showState(successState)
 
                         // On mobile, try to auto-open the app after a short delay
                         if (detectMobile()) {
                             setTimeout(() => {
-                                window.location.href = 'eggus://auth/confirmed?email=' + encodeURIComponent(data.user.email || '')
+                                openApp()
                             }, 1500)
                         }
                         return
@@ -516,7 +514,7 @@
                 // On mobile, try to open the app
                 if (detectMobile()) {
                     setTimeout(() => {
-                        window.location.href = 'eggus://auth/confirmed?email=' + encodeURIComponent(session.user.email || '')
+                        openApp()
                     }, 1500)
                 }
             }
