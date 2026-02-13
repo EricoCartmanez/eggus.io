@@ -4,92 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Privacy Policy - Eggus</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --navy-deep: #080e18;
+            --navy-mid: #0d1b2a;
+            --silver: #c0c7cf;
+            --silver-bright: #e8ecf0;
+            --silver-dim: #6b7a8d;
+            --accent: #4a7fb5;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
-            color: #ffffff;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-deep);
+            color: var(--silver);
             min-height: 100vh;
-            line-height: 1.6;
+            line-height: 1.7;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
+        .container { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+        header { text-align: center; margin-bottom: 50px; }
         h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.5rem; font-weight: 400;
+            color: var(--silver-bright); margin-bottom: 16px;
         }
-
-        .back-link {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .back-link:hover {
-            color: #ffffff;
-        }
-
+        .back-link { color: var(--silver-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        .back-link:hover { color: var(--silver-bright); }
         .content {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(13,27,42,0.6), rgba(8,14,24,0.8));
+            padding: 48px 40px; border-radius: 16px;
+            border: 1px solid rgba(107,122,141,0.1);
         }
-
-        h2 {
-            font-size: 1.5rem;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        p {
-            margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .updated {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 30px;
-        }
-
-        ul {
-            margin-left: 30px;
-            margin-bottom: 15px;
-        }
-
-        li {
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
-
-            .content {
-                padding: 25px;
-            }
-        }
+        h2 { font-size: 1.3rem; font-weight: 500; color: var(--silver-bright); margin-top: 32px; margin-bottom: 14px; }
+        h2:first-of-type { margin-top: 0; }
+        p { margin-bottom: 14px; font-size: 0.95rem; }
+        .updated { font-size: 0.85rem; color: var(--silver-dim); margin-bottom: 32px; }
+        ul { margin-left: 24px; margin-bottom: 14px; }
+        li { margin-bottom: 8px; font-size: 0.95rem; }
+        a { color: var(--accent); }
+        @media (max-width: 768px) { h1 { font-size: 2rem; } .content { padding: 28px 20px; } }
     </style>
 </head>
 <body>
@@ -98,7 +58,6 @@
             <h1>Privacy Policy</h1>
             <a href="index.html" class="back-link">← Back to Home</a>
         </header>
-
         <div class="content">
             <p class="updated">Last Updated: December 2025</p>
 
@@ -161,7 +120,7 @@
             <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
 
             <h2>Contact Us</h2>
-            <p>If you have questions about this Privacy Policy, please contact us at: <a href="mailto:support@eggus.io" style="color: rgba(255,255,255,0.9);">support@eggus.io</a></p>
+            <p>If you have questions about this Privacy Policy, please contact us at: <a href="mailto:support@eggus.io">support@eggus.io</a></p>
         </div>
     </div>
 </body>

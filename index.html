@@ -3,189 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Eggus - Bridge the Gap. Coming soon to iOS.">
+    <meta name="description" content="Eggus - Get out of your shell. Discover and connect with people nearby using Bluetooth. Coming soon to iOS and Android.">
     <title>Eggus - Get out of your shell</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --navy-deep: #080e18;
+            --navy-mid: #0d1b2a;
+            --navy-light: #1b2d44;
+            --silver: #c0c7cf;
+            --silver-bright: #e8ecf0;
+            --silver-dim: #6b7a8d;
+            --accent: #4a7fb5;
+            --accent-glow: rgba(74, 127, 181, 0.15);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a7b 100%);
-            color: #ffffff;
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-deep);
+            color: var(--silver);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ambient background */
+        .bg-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13, 27, 42, 0.9) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(30, 58, 95, 0.2) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 80% 60%, rgba(20, 40, 70, 0.15) 0%, transparent 60%);
+        }
+
+        /* Noise texture overlay */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+        }
+
+        .page {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ---- HERO ---- */
+        .hero {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            width: 100%;
-        }
-
-        header {
-            padding: 30px 0;
+            align-items: center;
+            justify-content: center;
             text-align: center;
+            padding: 60px 24px;
         }
 
         .logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+            width: 140px;
+            height: 140px;
+            margin-bottom: 32px;
+            filter: drop-shadow(0 0 40px rgba(74, 127, 181, 0.15));
+            animation: float 6s ease-in-out infinite;
         }
 
-        h1 {
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .brand {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 4.5rem;
+            font-weight: 500;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            line-height: 1;
+            background: linear-gradient(180deg, #f0f2f5 0%, #c0c7cf 35%, #8a95a3 60%, #c0c7cf 80%, #e8ecf0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .tagline {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 40px;
+            color: var(--silver-dim);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 48px;
         }
 
-        main {
-            flex: 1;
-            display: flex;
+        .status-pill {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 40px 0;
+            gap: 10px;
+            padding: 14px 32px;
+            border: 1px solid rgba(74, 127, 181, 0.25);
+            border-radius: 100px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent);
+            letter-spacing: 1px;
+            background: var(--accent-glow);
+            backdrop-filter: blur(20px);
         }
 
-        .hero {
-            text-align: center;
-            max-width: 800px;
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        .hero h2 {
-            font-size: 2rem;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 127, 181, 0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(74, 127, 181, 0); }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.3;
+            animation: bob 2s ease-in-out infinite;
+        }
+
+        .scroll-hint svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--silver-dim);
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* ---- DIVIDER ---- */
+        .divider {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--silver-dim), transparent);
+            margin: 0 auto;
+        }
+
+        /* ---- ABOUT SECTION ---- */
+        .section {
+            padding: 100px 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.2rem;
             font-weight: 400;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin: 50px 0;
-        }
-
-        .feature {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-
-        .feature:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .feature h3 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        .feature p {
-            color: rgba(255, 255, 255, 0.9);
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .cta {
-            margin: 50px 0;
-        }
-
-        .status {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-        }
-
-        footer {
-            padding: 40px 0;
+            color: var(--silver-bright);
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-links {
             margin-bottom: 20px;
         }
 
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--silver-dim);
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        /* ---- FEATURES ---- */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 36px 28px;
+            border-radius: 16px;
+            border: 1px solid rgba(107, 122, 141, 0.1);
+            background: linear-gradient(135deg, rgba(13, 27, 42, 0.6) 0%, rgba(8, 14, 24, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.4s ease, transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(74, 127, 181, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 1.6rem;
+            margin-bottom: 18px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--silver-bright);
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: var(--silver-dim);
+        }
+
+        /* ---- FOOTER ---- */
+        footer {
+            padding: 60px 24px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(107, 122, 141, 0.08);
+        }
+
+        .footer-links {
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            gap: 36px;
+            flex-wrap: wrap;
+        }
+
         .footer-links a {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--silver-dim);
             text-decoration: none;
-            margin: 0 20px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            letter-spacing: 0.5px;
             transition: color 0.3s ease;
         }
 
         .footer-links a:hover {
-            color: #ffffff;
+            color: var(--silver-bright);
         }
 
         .copyright {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.85rem;
+            color: rgba(107, 122, 141, 0.4);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
 
+        /* ---- RESPONSIVE ---- */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2rem;
+            .brand {
+                font-size: 3rem;
+                letter-spacing: 4px;
             }
 
-            .hero h2 {
-                font-size: 1.5rem;
+            .tagline {
+                font-size: 0.95rem;
+                letter-spacing: 2px;
             }
 
-            .features {
+            .features-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
 
-            .footer-links a {
-                display: block;
-                margin: 10px 0;
+            .section {
+                padding: 70px 20px;
             }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
+        /* ---- ANIMATIONS ---- */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        .fade-up:nth-child(1) { animation-delay: 0.1s; }
+        .fade-up:nth-child(2) { animation-delay: 0.2s; }
+        .fade-up:nth-child(3) { animation-delay: 0.3s; }
+        .fade-up:nth-child(4) { animation-delay: 0.4s; }
+        .fade-up:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <img src="logo.png" alt="Eggus Logo" class="logo">
-            <h1>EGGUS</h1>
-            <p class="tagline">Get out of your shell</p>
-        </header>
+    <div class="bg-glow"></div>
+    <div class="noise"></div>
 
-        <main>
-            <div class="hero">
-                <h2>Bridge the Gap</h2>
-                
-                <div class="cta">
-                    <span class="status">Coming Soon to iOS and Android</span>
+    <div class="page">
+        <!-- HERO -->
+        <section class="hero">
+            <img src="logo.png" alt="Eggus" class="logo fade-up">
+            <h1 class="brand fade-up">Eggus</h1>
+            <p class="tagline fade-up">Get out of your shell</p>
+            <div class="status-pill fade-up">
+                <span class="status-dot"></span>
+                Coming Soon to iOS &amp; Android
+            </div>
+            <div class="scroll-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+                    <path d="M12 5v14M19 12l-7 7-7-7"/>
+                </svg>
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <!-- ABOUT -->
+        <section class="section">
+            <h2 class="section-title reveal">Bridge the Gap</h2>
+            <p class="section-subtitle reveal">
+                Eggus uses Bluetooth to reveal the people around you in real time. 
+                Whether you're at a conference, concert, café, or campus — discover 
+                and connect with the strangers nearby.
+            </p>
+
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <span class="feature-icon">📡</span>
+                    <h3>Real-time Discovery</h3>
+                    <p>See who's nearby instantly via Bluetooth Low Energy — no GPS, no location tracking.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">👋</span>
+                    <h3>Ping &amp; Connect</h3>
+                    <p>Send a friendly ping to break the ice. If they ping back, you're connected.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">🤝</span>
+                    <h3>Bump</h3>
+                    <p>Get close and bump phones to instantly connect — physical proximity, digital connection.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">💬</span>
+                    <h3>Messaging</h3>
+                    <p>Chat with your new connections in real time. Keep the conversation going.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">🔒</span>
+                    <h3>Privacy First</h3>
+                    <p>You control who sees you and when. Go invisible anytime. Your data stays yours.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Zero Friction</h3>
+                    <p>No usernames to exchange, no QR codes to scan. Just proximity and intent.</p>
                 </div>
             </div>
-        </main>
+        </section>
 
+        <!-- FOOTER -->
         <footer>
             <div class="footer-links">
                 <a href="privacy.html">Privacy Policy</a>
@@ -195,5 +414,18 @@
             <p class="copyright">&copy; 2025 Eggus. All rights reserved.</p>
         </footer>
     </div>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
 </body>
 </html>
