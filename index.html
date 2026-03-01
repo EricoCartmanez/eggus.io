@@ -416,6 +416,23 @@
     </div>
 
     <script>
+        // OAuth/PKCE redirect: if Supabase lands here with a code, pass it to the app.
+        // This only fires on Android — iOS uses ASWebAuthenticationSession which
+        // captures the eggus:// redirect directly and never hits this page.
+        (function() {
+            var code = new URLSearchParams(window.location.search).get('code');
+            if (!code) return;
+            var deepLink = 'eggus://auth/callback?code=' + encodeURIComponent(code);
+            if (/Android/i.test(navigator.userAgent)) {
+                window.location.href = deepLink;
+            } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                // iOS shouldn't arrive here, but handle gracefully
+                window.location.href = deepLink;
+            } else {
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#080e18;color:#c0c7cf;font-family:sans-serif;text-align:center;padding:20px"><div><h2 style="color:#e8ecf0;margin-bottom:16px">Open Eggus on your phone</h2><p>Sign in was successful. Open the Eggus app on your phone to continue.</p></div></div>';
+            }
+        })();
+
         // Scroll reveal
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
