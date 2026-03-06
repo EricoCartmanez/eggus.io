@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Your Data - Eggus</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy-deep: #080e18;
+            --navy-mid: #0d1b2a;
+            --silver: #c0c7cf;
+            --silver-bright: #e8ecf0;
+            --silver-dim: #6b7a8d;
+            --accent: #4a7fb5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--navy-deep);
+            color: var(--silver);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+        header { text-align: center; margin-bottom: 50px; }
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2.5rem; font-weight: 400;
+            color: var(--silver-bright); margin-bottom: 16px;
+        }
+        .back-link { color: var(--silver-dim); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
+        .back-link:hover { color: var(--silver-bright); }
+        .content {
+            background: linear-gradient(135deg, rgba(13,27,42,0.6), rgba(8,14,24,0.8));
+            padding: 48px 40px; border-radius: 16px;
+            border: 1px solid rgba(107,122,141,0.1);
+        }
+        h2 { font-size: 1.3rem; font-weight: 500; color: var(--silver-bright); margin-top: 32px; margin-bottom: 14px; }
+        h2:first-of-type { margin-top: 0; }
+        p { margin-bottom: 14px; font-size: 0.95rem; }
+        .updated { font-size: 0.85rem; color: var(--silver-dim); margin-bottom: 32px; }
+        ul { margin-left: 24px; margin-bottom: 14px; }
+        li { margin-bottom: 8px; font-size: 0.95rem; }
+        ol { margin-left: 24px; margin-bottom: 14px; }
+        ol li { margin-bottom: 8px; font-size: 0.95rem; }
+        a { color: var(--accent); }
+        strong { color: var(--silver-bright); font-weight: 500; }
+        @media (max-width: 768px) { h1 { font-size: 2rem; } .content { padding: 28px 20px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Delete Your Data</h1>
+            <a href="index.html" class="back-link">&larr; Back to Home</a>
+        </header>
+        <div class="content">
+            <p class="updated">Last Updated: March 2026</p>
+
+            <h2>Delete Your Account from the App</h2>
+            <p>You can delete your account and all associated data directly from the Eggus app:</p>
+            <ol>
+                <li>Open the Eggus app and go to your <strong>Profile</strong> tab</li>
+                <li>Tap <strong>Settings</strong> (gear icon)</li>
+                <li>Scroll down and tap <strong>Delete Account</strong></li>
+                <li>Confirm the deletion when prompted</li>
+            </ol>
+            <p>Your account and data will be permanently deleted immediately.</p>
+
+            <h2>Request Deletion via Email</h2>
+            <p>If you are unable to access the app or prefer to request deletion manually, you can email us at <a href="mailto:support@eggus.io">support@eggus.io</a> with the subject line <strong>"Delete My Account"</strong>. Please include the email address associated with your Eggus account so we can locate and remove your data.</p>
+            <p>We will process your request within 7 business days and send you a confirmation once complete.</p>
+
+            <h2>What Gets Deleted</h2>
+            <p>When you delete your account, the following data is permanently removed:</p>
+            <ul>
+                <li>Your profile information (name, bio, avatar)</li>
+                <li>Your contact list and encounter history</li>
+                <li>All messages you have sent and received</li>
+                <li>Ping and bump history</li>
+                <li>Push notification tokens and device identifiers</li>
+                <li>Authentication credentials</li>
+            </ul>
+
+            <h2>What We May Retain</h2>
+            <p>In limited cases, we may retain certain data as required by law or for legitimate business purposes:</p>
+            <ul>
+                <li>Records needed to comply with legal obligations (e.g., abuse reports)</li>
+                <li>Anonymized or aggregated data that can no longer be linked to you</li>
+            </ul>
+
+            <h2>Questions?</h2>
+            <p>If you have any questions about data deletion, please contact us at <a href="mailto:support@eggus.io">support@eggus.io</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
