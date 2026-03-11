@@ -130,6 +130,23 @@
             font-size: 1.3rem;
         }
 
+        .hint {
+            font-size: 0.85rem;
+            color: var(--silver-dim);
+            line-height: 1.5;
+            max-width: 280px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .hint strong {
+            color: var(--silver-bright);
+        }
+
+        .hint.visible {
+            display: block;
+        }
+
         .or-text {
             font-size: 0.8rem;
             color: var(--silver-dim);
@@ -168,9 +185,10 @@
         <p class="redirecting" id="redirect-msg"></p>
 
         <div class="buttons">
-            <a href="https://testflight.apple.com/join/zAnxyfVb" class="btn btn-ios">
+            <a href="https://testflight.apple.com/join/zAnxyfVb" class="btn btn-ios" id="btn-ios" onclick="showIosHint(event)">
                 <span class="btn-icon">&#63743;</span> Download for iOS
             </a>
+            <p class="hint" id="ios-hint">Eggus for iOS is available via <strong>TestFlight</strong>. Tap the link to install it — the app will appear on your home screen.</p>
             <span class="or-text">or</span>
             <a href="https://play.google.com/store/apps/details?id=io.eggus.app" class="btn btn-android">
                 <span class="btn-icon">&#9654;</span> Download for Android
@@ -187,18 +205,23 @@
             var ua = navigator.userAgent;
             var msg = document.getElementById('redirect-msg');
 
-            if (/iPhone|iPad|iPod/i.test(ua)) {
-                msg.textContent = 'Redirecting to TestFlight\u2026';
-                setTimeout(function() {
-                    window.location.href = 'https://testflight.apple.com/join/zAnxyfVb';
-                }, 1500);
-            } else if (/Android/i.test(ua)) {
+            if (/Android/i.test(ua)) {
                 msg.textContent = 'Redirecting to Google Play\u2026';
                 setTimeout(function() {
                     window.location.href = 'https://play.google.com/store/apps/details?id=io.eggus.app';
                 }, 1500);
             }
         })();
+
+        function showIosHint(e) {
+            var hint = document.getElementById('ios-hint');
+            if (!hint.classList.contains('visible')) {
+                e.preventDefault();
+                hint.classList.add('visible');
+                var btn = document.getElementById('btn-ios');
+                btn.onclick = null;
+            }
+        }
     </script>
 </body>
 </html>
