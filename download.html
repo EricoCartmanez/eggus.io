@@ -136,15 +136,10 @@
             line-height: 1.5;
             max-width: 280px;
             margin: 0 auto;
-            display: none;
         }
 
         .hint strong {
             color: var(--silver-bright);
-        }
-
-        .hint.visible {
-            display: block;
         }
 
         .or-text {
@@ -185,10 +180,10 @@
         <p class="redirecting" id="redirect-msg"></p>
 
         <div class="buttons">
-            <a href="https://testflight.apple.com/join/zAnxyfVb" class="btn btn-ios" id="btn-ios" onclick="showIosHint(event)">
+            <a href="https://testflight.apple.com/join/zAnxyfVb" class="btn btn-ios">
                 <span class="btn-icon">&#63743;</span> Download for iOS
             </a>
-            <p class="hint" id="ios-hint">Eggus for iOS is available via <strong>TestFlight</strong>. Tap the link to install it — the app will appear on your home screen.</p>
+            <p class="hint visible">Since Eggus is still in beta, it will be provided via Apple's <strong>TestFlight</strong>. Install it by tapping on this button and Eggus will be available in there.</p>
             <span class="or-text">or</span>
             <a href="https://play.google.com/store/apps/details?id=io.eggus.app" class="btn btn-android">
                 <span class="btn-icon">&#9654;</span> Download for Android
@@ -213,15 +208,6 @@
             }
         })();
 
-        function showIosHint(e) {
-            var hint = document.getElementById('ios-hint');
-            if (!hint.classList.contains('visible')) {
-                e.preventDefault();
-                hint.classList.add('visible');
-                var btn = document.getElementById('btn-ios');
-                btn.onclick = null;
-            }
-        }
     </script>
 </body>
 </html>
