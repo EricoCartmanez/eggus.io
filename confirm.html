@@ -392,15 +392,16 @@
         })
 
         async function handleConfirmation() {
-            // Check for code parameter (PKCE flow - email confirmation)
             const urlParams = new URLSearchParams(window.location.search)
+            const tokenHash = urlParams.get('token_hash')
+            const type = urlParams.get('type')
             const code = urlParams.get('code')
-            
-            // Parse the URL hash for tokens (older flow)
+
+            // Parse the URL hash for errors or tokens (redirect from Supabase verify endpoint)
             const hashParams = new URLSearchParams(window.location.hash.substring(1))
             const accessToken = hashParams.get('access_token')
             const refreshToken = hashParams.get('refresh_token')
-            const type = hashParams.get('type')
+            const hashType = hashParams.get('type')
             const error = hashParams.get('error') || urlParams.get('error')
             const errorDescription = hashParams.get('error_description') || urlParams.get('error_description')
 
@@ -411,27 +412,63 @@
                 return
             }
 
-            // PKCE FLOW: If we have a code parameter, pass it to the iOS app
-            // The app has the code_verifier needed to exchange this code for a session
+            // ── TOKEN_HASH FLOW (primary — bot-proof) ──
+            // Email links to: confirm.html?token_hash=xxx&type=signup
+            // Verification happens HERE via JS, not via Supabase's GET endpoint.
+            // Email provider bots can prefetch the URL but won't execute JS, so
+            // the token stays valid until the real user loads this page.
+            if (tokenHash && (type === 'signup' || type === 'email_change')) {
+                console.log('Using token_hash + verifyOtp flow...')
+                try {
+                    const { data, error: verifyError } = await supabaseClient.auth.verifyOtp({
+                        type: type === 'email_change' ? 'email_change' : 'signup',
+                        token_hash: tokenHash
+                    })
+
+                    if (verifyError) {
+                        console.error('verifyOtp error:', verifyError)
+                        showState(errorState)
+                        if (verifyError.message.includes('expired') || verifyError.message.includes('invalid')) {
+                            errorMessage.textContent = 'This confirmation link has expired or already been used. Please request a new one in the app.'
+                        } else {
+                            errorMessage.textContent = verifyError.message
+                        }
+                        return
+                    }
+
+                    // Success — email is now confirmed
+                    const email = data?.user?.email || data?.session?.user?.email
+                    emailBadge.textContent = email || 'Your account'
+                    appDeepLink = 'eggus://auth/confirmed'
+                    showState(successState)
+
+                    if (detectMobile()) {
+                        setTimeout(() => { openApp() }, 1500)
+                    }
+                    return
+                } catch (err) {
+                    console.error('verifyOtp exception:', err)
+                    showState(errorState)
+                    errorMessage.textContent = 'Failed to verify your email. Please try again.'
+                    return
+                }
+            }
+
+            // ── PKCE CODE FLOW (legacy — redirect from Supabase verify endpoint) ──
+            // Kept for backwards compatibility with emails already sent using {{ .ConfirmationURL }}
             if (code) {
-                console.log('PKCE code detected - passing to iOS app for exchange')
-                
-                // Build the deep link with the code so iOS can exchange it
+                console.log('PKCE code detected - passing to app for exchange')
                 appDeepLink = 'eggus://auth/callback?code=' + encodeURIComponent(code)
-                
                 emailBadge.textContent = 'Your email has been verified'
                 showState(successState)
-                
-                // On mobile, try to open the app immediately after a short delay
+
                 if (detectMobile()) {
-                    setTimeout(() => {
-                        openApp()
-                    }, 1500)
+                    setTimeout(() => { openApp() }, 1500)
                 }
                 return
             }
 
-            // HASH FLOW: If we have tokens in the hash, set the session (older/OAuth flow)
+            // ── HASH FLOW (legacy — tokens in URL fragment) ──
             if (accessToken && refreshToken) {
                 try {
                     const { data, error: sessionError } = await supabaseClient.auth.setSession({
@@ -447,19 +484,14 @@
                     }
 
                     if (data.user) {
-                        // Success!
                         emailBadge.textContent = data.user.email || 'Your account'
-                        // For hash flow, we can pass tokens to the app
-                        appDeepLink = 'eggus://auth/callback#access_token=' + accessToken + 
+                        appDeepLink = 'eggus://auth/callback#access_token=' + accessToken +
                                       '&refresh_token=' + refreshToken +
                                       '&type=signup'
                         showState(successState)
 
-                        // On mobile, try to auto-open the app after a short delay
                         if (detectMobile()) {
-                            setTimeout(() => {
-                                openApp()
-                            }, 1500)
+                            setTimeout(() => { openApp() }, 1500)
                         }
                         return
                     }
@@ -471,37 +503,20 @@
                 }
             }
 
-            // Check if user is already logged in (came from a different flow)
+            // ── FALLBACK — no recognized parameters ──
             try {
                 const { data: { session } } = await supabaseClient.auth.getSession()
-                
-                if (session && session.user) {
-                    // User is already authenticated
-                    if (session.user.email_confirmed_at) {
-                        emailBadge.textContent = session.user.email || 'Your account'
-                        showState(successState)
-                    } else {
-                        // Logged in but email not confirmed yet
-                        showState(errorState)
-                        errorMessage.textContent = 'Your email has not been confirmed yet. Please check your inbox.'
-                    }
+                if (session && session.user && session.user.email_confirmed_at) {
+                    emailBadge.textContent = session.user.email || 'Your account'
+                    showState(alreadyConfirmedState)
                     return
                 }
             } catch (err) {
                 console.error('Error checking session:', err)
             }
 
-            // No tokens and no session - might be an invalid or expired link
-            // Check if there's a confirmation type in the URL
-            if (type === 'signup' || type === 'email_change') {
-                // This was a confirmation link but something went wrong
-                showState(errorState)
-                errorMessage.textContent = 'This confirmation link has expired or already been used. Please request a new one.'
-            } else {
-                // User landed here without proper parameters
-                showState(errorState)
-                errorMessage.textContent = 'Invalid confirmation link. Please check your email for the correct link.'
-            }
+            showState(errorState)
+            errorMessage.textContent = 'Invalid confirmation link. Please check your email for the correct link.'
         }
 
         // Listen for auth state changes
