@@ -436,7 +436,25 @@
                         return
                     }
 
-                    // Success — email is now confirmed
+                    // Success — email is now confirmed in Supabase Auth.
+                    // Now update the profile row in the DB so the app sees it immediately.
+                    const authUserId = data?.user?.id || data?.session?.user?.id
+                    if (authUserId) {
+                        try {
+                            const { error: updateError } = await supabaseClient
+                                .from('profiles')
+                                .update({ is_guest: false, email_verified: true })
+                                .eq('auth_user_id', authUserId)
+                            if (updateError) {
+                                console.error('Profile update error:', updateError)
+                            } else {
+                                console.log('✅ Profile updated: is_guest=false, email_verified=true')
+                            }
+                        } catch (err) {
+                            console.error('Profile update exception:', err)
+                        }
+                    }
+
                     const email = data?.user?.email || data?.session?.user?.email
                     emailBadge.textContent = email || 'Your account'
                     appDeepLink = 'eggus://auth/confirmed'
