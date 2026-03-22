@@ -458,18 +458,9 @@
                     const email = data?.user?.email || data?.session?.user?.email
                     emailBadge.textContent = email || 'Your account'
 
-                    // Pass session tokens to the app so it can establish an auth session.
-                    // Without this, the app has no session and still treats the user as guest.
-                    // Uses query params (not fragment) because iOS drops fragments from custom scheme URLs.
-                    const session = data?.session
-                    if (session?.access_token && session?.refresh_token) {
-                        appDeepLink = 'eggus://auth/callback?access_token=' +
-                            encodeURIComponent(session.access_token) +
-                            '&refresh_token=' + encodeURIComponent(session.refresh_token) +
-                            '&type=signup'
-                    } else {
-                        appDeepLink = 'eggus://auth/confirmed'
-                    }
+                    // Deep link back to the app. confirm.html already updated the profile
+                    // in DB (is_guest=false, email_verified=true). The app reloads on resume.
+                    appDeepLink = 'eggus://auth/callback'
                     showState(successState)
 
                     if (detectMobile()) {
