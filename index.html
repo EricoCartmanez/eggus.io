@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Eggus - Get out of your shell. Discover and connect with people nearby using Bluetooth. Coming soon to iOS and Android.">
+    <meta name="description" content="Eggus - Get out of your shell. Discover and connect with people nearby using Bluetooth. Available on iOS and Android.">
     <title>Eggus - Get out of your shell</title>
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -124,33 +124,6 @@
             margin-bottom: 48px;
         }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 14px 32px;
-            border: 1px solid rgba(74, 127, 181, 0.25);
-            border-radius: 100px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--accent);
-            letter-spacing: 1px;
-            background: var(--accent-glow);
-            backdrop-filter: blur(20px);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 127, 181, 0.4); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(74, 127, 181, 0); }
-        }
 
         .scroll-hint {
             position: absolute;
@@ -278,6 +251,56 @@
             letter-spacing: 0.5px;
         }
 
+        /* ---- HERO BUTTONS ---- */
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 260px;
+            padding: 16px 28px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-ios {
+            background: linear-gradient(135deg, #333 0%, #1a1a1a 100%);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-android {
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-icon {
+            font-size: 1.3rem;
+        }
+
+        .availability {
+            font-size: 0.85rem;
+            color: var(--silver-dim);
+            letter-spacing: 0.5px;
+        }
+
         /* ---- RESPONSIVE ---- */
         @media (max-width: 768px) {
             .brand {
@@ -301,6 +324,10 @@
 
             .section-title {
                 font-size: 1.8rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
             }
 
             .footer-links {
@@ -348,10 +375,15 @@
             <img src="logo.png" alt="Eggus" class="logo fade-up">
             <h1 class="brand fade-up">Eggus</h1>
             <p class="tagline fade-up">Get out of your shell</p>
-            <div class="status-pill fade-up">
-                <span class="status-dot"></span>
-                Coming Soon to iOS &amp; Android
+            <div class="hero-buttons fade-up">
+                <a href="https://apps.apple.com/gr/app/eggus/id6758737871" class="btn btn-ios">
+                    <span class="btn-icon">&#63743;</span> Download for iOS
+                </a>
+                <a href="https://play.google.com/store/apps/details?id=io.eggus.app" class="btn btn-android">
+                    <span class="btn-icon">&#9654;</span> Download for Android
+                </a>
             </div>
+            <p class="availability fade-up">Currently available in select countries</p>
             <div class="scroll-hint">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
                     <path d="M12 5v14M19 12l-7 7-7-7"/>
@@ -366,15 +398,15 @@
             <h2 class="section-title reveal">Bridge the Gap</h2>
             <p class="section-subtitle reveal">
                 Eggus uses Bluetooth to reveal the people around you in real time. 
-                Whether you're at a conference, concert, café, or campus — discover 
-                and connect with the strangers nearby.
+                Whether you're at a conference, concert, café, or campus discover 
+                and connect with peers nearby.
             </p>
 
             <div class="features-grid">
                 <div class="feature-card reveal">
                     <span class="feature-icon">📡</span>
                     <h3>Real-time Discovery</h3>
-                    <p>See who's nearby instantly via Bluetooth Low Energy — no GPS, no location tracking.</p>
+                    <p>See who's nearby instantly via Bluetooth Low Energy, no GPS, no location tracking.</p>
                 </div>
                 <div class="feature-card reveal">
                     <span class="feature-icon">👋</span>
@@ -384,7 +416,7 @@
                 <div class="feature-card reveal">
                     <span class="feature-icon">🤝</span>
                     <h3>Bump</h3>
-                    <p>Get close and bump phones to instantly connect — physical proximity, digital connection.</p>
+                    <p>Get close and bump phones to instantly connect; physical proximity, digital connection.</p>
                 </div>
                 <div class="feature-card reveal">
                     <span class="feature-icon">💬</span>
@@ -418,7 +450,7 @@
 
     <script>
         // OAuth/PKCE redirect: if Supabase lands here with a code, pass it to the app.
-        // This only fires on Android — iOS uses ASWebAuthenticationSession which
+        // This only fires on Android; iOS uses ASWebAuthenticationSession which
         // captures the eggus:// redirect directly and never hits this page.
         (function() {
             var code = new URLSearchParams(window.location.search).get('code');
